@@ -28,6 +28,7 @@
 		5C1104F922BCC4C300F8E034 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		5C11050022BCC4EC00F8E034 /* Ptr.hxx */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Ptr.hxx; sourceTree = "<group>"; };
 		5C11050122BCC4EC00F8E034 /* Ptr.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Ptr.hpp; sourceTree = "<group>"; };
+		5C4E7377240F16AF004A7879 /* CMakeLists.txt */ = {isa = PBXFileReference; explicitFileType = sourcecode.make; path = CMakeLists.txt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -63,6 +64,7 @@
 				5C1104F922BCC4C300F8E034 /* main.cpp */,
 				5C11050022BCC4EC00F8E034 /* Ptr.hxx */,
 				5C11050122BCC4EC00F8E034 /* Ptr.hpp */,
+				5C4E7377240F16AF004A7879 /* CMakeLists.txt */,
 			);
 			path = SafePtr;
 			sourceTree = "<group>";
