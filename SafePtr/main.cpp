@@ -20,6 +20,7 @@ public:
 int main(int argc, const char * argv[]) {
     // insert code here...
   auto p = Ptr<int>::New(0);
-  
+  auto a = 42;
+  p = Ptr<int>::Adr(a);
   return 0;
 }

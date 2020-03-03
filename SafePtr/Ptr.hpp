@@ -69,7 +69,7 @@ public:
   template <typename ...Args>
   static Ptr New(Args... args);
 
-  /// \brief delete ptr if needed
+  /// \brief delete ptr if needed and set all Ptr with the same ptr at nullptr
   static void Delete(Ptr& ptr);
 
   /// \brief build the pointer through a variable. The Ptr won't be deleted but will be set at null as soon as ~Ptr is called
@@ -139,4 +139,23 @@ Ptr<T> Ptr<T>::New(Args... args) {
   auto ptr = new T(args...);
   return Ptr(ptr, true);
 }
+
+template <typename T>
+Ptr<T> Ptr<T>::Adr(T& variable) {
+  return Ptr(&variable, false);
+}
+
+template <typename T>
+void Ptr<T>::Delete(Ptr& ptr) {
+  if (ptr.toDelete) {
+    delete ptr.m_ptr;
+  }
+  for (auto* p : list[ptr.m_ptr]) {
+    p->m_ptr = nullptr;
+    p->m_id = -1;
+    p->toDelete = false;
+  }
+
+}
+
 #include "Ptr.hxx"
