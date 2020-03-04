@@ -17,6 +17,7 @@ protected:
   bool newest = false;
   bool toDelete = false;
   T* m_ptr = nullptr;
+  int m_offset = 0;
   size_t m_id = -1;
 
     /// \def list is a map of all T* pointers and the associated Ptr to that pointer.

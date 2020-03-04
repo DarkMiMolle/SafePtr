@@ -1,17 +1,13 @@
 
 
 template <typename T>
-Ptr<T>::Ptr(const Ptr& cpy) {
-  m_ptr = cpy.m_ptr;
-  toDelete = cpy.toDelete;
+Ptr<T>::Ptr(const Ptr& cpy): m_ptr(cpy.m_ptr), toDelete(cpy.toDelete), m_offset(cpy.m_offset) {
   m_id = list[m_ptr].size();
   list[m_ptr].push_back(this);
 }
 
 template <typename T>
-Ptr<T>::Ptr(const Ptr&& mv) {
-  m_ptr = mv.m_ptr;
-  toDelete = mv.toDelete;
+Ptr<T>::Ptr(const Ptr&& mv): m_ptr(mv.m_ptr), toDelete(mv.toDelete), m_offset(mv.m_offset)  {
   m_id = list[m_ptr].size();
   list[m_ptr].push_back(this);
 }
@@ -29,6 +25,7 @@ template <typename T>
 Ptr<T>& Ptr<T>::operator=(const Ptr &cpy) {
   pre_dtor();
   m_ptr = cpy.m_ptr;
+  m_offset = cpy.m_offset;
   m_id = list[m_ptr].size();
   toDelete = cpy.toDelete;
   list[m_ptr].push_back(this);
@@ -39,6 +36,7 @@ template <typename T>
 Ptr<T>& Ptr<T>::operator=(const Ptr<T> &&mv) {
   pre_dtor();
   m_ptr = mv.m_ptr;
+  m_offset = mv.m_offset;
   m_id = list[m_ptr].size();
   toDelete = mv.toDelete;
   list[m_ptr].push_back(this);
@@ -50,6 +48,7 @@ Ptr<T>& Ptr<T>::operator=(std::nullptr_t null) {
   if (null != nullptr) throw bad_access_ptr();
   pre_dtor();
   m_id = -1;
+  m_offset = 0;
   m_ptr = nullptr;
   toDelete = false;
   return *this;
@@ -85,59 +84,77 @@ void Ptr<T>::Delete(Ptr& ptr) {
 
 template <typename T>
 bool Ptr<T>::operator==(const Ptr& ptr) const {
-  return m_ptr == ptr.m_ptr;
+  return m_ptr == ptr.m_ptr && m_offset == ptr.m_offset;
 }
 
 template <typename T>
 bool Ptr<T>::operator==(const Ptr&& ptr) const {
-  return  m_ptr == ptr.m_ptr;
+  return  m_ptr == ptr.m_ptr && m_offset == ptr.m_offset;
 }
 
 template <typename T>
 bool Ptr<T>::operator==(const T* ptr) const {
-  return m_ptr == ptr;
+  return m_ptr ? m_ptr + m_offset == ptr : m_ptr == ptr;
 }
 
 
 template <typename T>
 Ptr<T> Ptr<T>::operator+(const int i) const {
-  return Ptr(m_ptr + i, false);
+  if (!m_ptr) throw bad_access_ptr();
+  auto&& ret = std::move(*this);
+  ret.m_offset += i;
+  return ret;
 }
 
 template <typename T>
 Ptr<T> Ptr<T>::operator-(const int i) const {
-  return Ptr(m_ptr - i, false);
+  if (!m_ptr) throw bad_access_ptr();
+  auto&& ret = std::move(*this);
+  ret.m_offset -= i;
+  return ret;
+}
 }
 
 template <typename T>
 Ptr<T>& Ptr<T>::operator++() {
+  if (!m_ptr) throw bad_access_ptr();
+  ++m_offset;
   return *this;
 }
 
 template <typename T>
 Ptr<T>& Ptr<T>::operator--() {
+  if (!m_ptr) throw bad_access_ptr();
+  --m_offset;
   return *this;
 }
 
 
 template <typename T>
 Ptr<T>::operator bool() const {
-  return m_ptr == nullptr;
+  return m_ptr != nullptr;
 }
 
 template <typename T>
 const T* Ptr<T>::operator->() const {
   if (!m_ptr) throw bad_access_ptr();
-    return m_ptr;
+    return m_ptr + m_offset;
 }
 
 template <typename T>
 T* Ptr<T>::operator->() {
-  return m_ptr;
+  if (!m_ptr) throw bad_access_ptr();
+  return m_ptr + m_offset;
 }
 
 template <typename T>
 const T& Ptr<T>::operator*() const {
   if (!m_ptr) throw bad_access_ptr();
-  return *m_ptr;
+  return *(m_ptr + m_offset);
+}
+
+template <typename T>
+T& Ptr<T>::operator*() {
+  if (!m_ptr) throw bad_access_ptr();
+  return  *(m_ptr + m_offset);
 }
