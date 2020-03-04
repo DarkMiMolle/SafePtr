@@ -9,18 +9,17 @@
 #include <iostream>
 #include "Ptr.hpp"
 
-class A {
-public:
-    virtual void print(int val) {
-        std::cout << "i print " << val << '\n';
-    }
+struct A {
+  Ptr<A> next;
 };
 
 
 int main(int argc, const char * argv[]) {
     // insert code here...
-  auto p = Ptr<int>::New(0);
-  auto a = 42;
-  p = Ptr<int>::Adr(a);
+  {
+    auto first = Ptr<A>::New(42);
+    first->next = Ptr<A>::New();
+    first->next->next.LoopOn(first);
+  }
   return 0;
 }

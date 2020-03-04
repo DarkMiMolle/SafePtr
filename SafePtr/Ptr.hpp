@@ -14,7 +14,7 @@ public:
 template <typename T>
 class Ptr {
 protected:
-  bool newest = false;
+  Ptr* looped = nullptr;
   bool toDelete = false;
   T* m_ptr = nullptr;
   int m_offset = 0;
@@ -32,7 +32,10 @@ protected:
       } else {
         list.erase(m_ptr);
         if (toDelete) {
-          delete m_ptr;
+          toDelete = false;
+          auto tmp = m_ptr;
+          m_ptr = nullptr;
+          delete tmp;
         }
       }
     }
@@ -40,7 +43,6 @@ protected:
 
   /// \brief make the pointer
   Ptr(T* ptr, bool del): m_ptr(ptr), toDelete(del) {
-    newest = true;
     if (!list.count(ptr)) {
       list[ptr] = {this};
     } else {
@@ -49,6 +51,7 @@ protected:
     m_id = list[ptr].size() - 1;
   }
 public:
+//    inline static std::map<T*, std::vector<Ptr*>> list;
 
   Ptr() = default; /// \brief set Ptr as nullptr
   Ptr(const Ptr& copy);
@@ -85,6 +88,9 @@ public:
 
   /// \brief delete ptr if needed and set all Ptr with the same ptr at nullptr
   static void Delete(Ptr& ptr);
+
+  /// \brief allows to make loops: A -> B -> A, so when A is out of access, it will be set at nullptr for B
+  Ptr& LoopOn(Ptr& ptr);
 
   /// \brief build the pointer through a variable. The Ptr won't be deleted but will be set at nullptr as soon as ~Ptr is called
   static Ptr Adr(T& variable);

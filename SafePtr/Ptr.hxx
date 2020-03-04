@@ -14,11 +14,10 @@ Ptr<T>::Ptr(const Ptr&& mv): m_ptr(mv.m_ptr), toDelete(mv.toDelete), m_offset(mv
 
 template <typename T>
 Ptr<T>::~Ptr() {
-  if (newest) {
-    newest = false;
-  } else {
     pre_dtor();
-  }
+    if (looped) {
+      *looped = nullptr;
+    }
 }
 
 template <typename T>
@@ -113,7 +112,6 @@ Ptr<T> Ptr<T>::operator-(const int i) const {
   ret.m_offset -= i;
   return ret;
 }
-}
 
 template <typename T>
 Ptr<T>& Ptr<T>::operator++() {
@@ -157,4 +155,11 @@ template <typename T>
 T& Ptr<T>::operator*() {
   if (!m_ptr) throw bad_access_ptr();
   return  *(m_ptr + m_offset);
+}
+
+template <typename T>
+Ptr<T>& Ptr<T>::LoopOn(Ptr& ptr) {
+  *this = ptr;
+  ptr.looped = this;
+  return *this;
 }
